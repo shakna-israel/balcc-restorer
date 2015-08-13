@@ -1,0 +1,39 @@
+#!/bin/bash
+#Append partition label/name to fdisk -l output
+#Version 0.01b  By Emmanuel_uk using unSpawn kind suggestions
+#Tested with ext3 and Reiserfs. Fat ignored.
+#Need root privelege or at least sudo fdisk
+
+#Output will be like
+#Device Boot      Start         End      Blocks   Id  System
+#/dev/sda2             765        1528     6136830   83  Linux --------> somelabel
+
+separator=" --------> " #Appended before partition label. Spaces are good
+msg_if_nolabel="no_label_found"
+verbose=1 #1 for on, 0 otherwise
+
+#Sanity check reiserutil=1 if reiserfstune is present (used to catch partition name)
+reiserutil=$(which reiserfstune)  #path + length is > = 12 characters
+if [ ${#reiserutil} -ge 12 ]; then reiserutil=1; else reiserutil=0; fi  #1=present
+# No warning here if reiserfstune not there. We want to keep fdisk output as close as normal
+
+fdisk -l | while read line;  #looping around fdisk -l output
+do {   #Parsing each line, we want a line starting with /dev/, Linux type but not swap, the first field only
+  aHDdevice=$(echo "$line" | grep '^/dev/' | grep -i 'Linux' | grep -iv 'swap'| awk '{print $1}'  )
+  if [ "${aHDdevice:0:5}" = "/dev/" ]; then #we found a device
+   thelabel=$( e2label $aHDdevice 2>/dev/null ) #error by e2label into null oblition
+   #If zero length label and reiserfstune available query further
+   if [ ${#thelabel} -eq 0 ] && [ $reiserutil -eq 1 ]; then #empty label or no label. Test if reiserfs then
+     thelabel=$( reiserfstune $aHDdevice 2>/dev/null | grep LABEL | awk '{print $2}' )
+     if [ ${#thelabel} -eq 0 ]; then thelabel=$msg_if_nolabel; fi
+   fi #fi of reiserfs or ext2/ext3
+   echo "$line"$separator"$thelabel"; #modified fdisk -l output
+  else    #just a normal fdisk output line to print unchanged
+   echo "$line"  # Quote needed otherwise a * is a glob, like that of the geometry
+  fi
+}
+done
+if [ $reiserutil -eq 0 ] && [ $verbose -eq 1 ]; then 
+ echo "Note: reiserfstune not present. Partition labels for Reiserfs ignored"; 
+fi
+exit 0

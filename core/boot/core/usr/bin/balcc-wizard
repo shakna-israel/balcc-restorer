@@ -1,23 +1,59 @@
-#!/bin/sh
+#!/bin/ash
 # Script to Generate and Restore System-Level Images
 
-function intro {
+fetch_hard_drive () {
+    fdisk -l
+    # /usr/bin/dev_labels
+    # dev_labels only currently works in Bash, not Ash
+}
+
+generate_image () {
+    dd if=$1 conv=sync,noerror bs=64K | gzip -9c  > $2/$3.img.gz
+    fdisk -l /dev/hda > $2/$3.info
+}
+
+restore_image () {
+    gunzip -c $1 | dd of=$2 bs=64K
+}
+
+choose_mount () {
+    fdisk -l
+    if [ "$1" = "generate" ]; then
+        echo "Generating Images Not Yet Implemented"
+        read
+    fi
+    if [ "$1" = "restore" ]; then
+        echo "Restoring Images Not Yet Implemented"
+        read
+    fi
+}
+
+choice_restore_generate () {
+    echo "Do you wish to (G)enerate a new image, or (R)estore from an old one?"
+    read choice
+    if [ -n "$choice" ]; then
+        if [ "x$choice" = "G"; then
+            choose_mount generate
+        fi
+        if [ "x$choice" = "R"; then
+            choose_mount restore
+        fi
+    else
+        choice_restore_generate
+    fi
+}
+
+intro () {
     echo "Welcome to balcc-restorer"
     echo "Proceed with CAUTION"
     echo ""
     echo "Press enter to continue"
     read
+    clear
+    choice_restore_generate
 }
 
-function generate_image {
-    dd if=$1 conv=sync,noerror bs=64K | gzip -c  > $2/$3.img.gz
-    fdisk -l /dev/hda > $2/$3.info
-}
-
-function restore_image {
-    gunzip -c $1 | dd of=$2 bs=64K 
-}
-
+# Main
 intro
 # Display Hard Drives
 # Ask if Restoring Image or Generating Image
