@@ -19,3 +19,9 @@ function restore_image {
 }
 
 intro
+# Display Hard Drives
+# Ask if Restoring Image or Generating Image
+# Choose Hard Drive to Mount, to Restore Image From or Generate Image To
+# Choose Hard Drive to Generate Image From or Restore Image To
+# Run generate_image or restore_image with correct parameters
+# Poweroff
