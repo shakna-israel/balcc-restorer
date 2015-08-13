@@ -4,3 +4,4 @@
 # and therefore not slow down the boot process.
 /usr/bin/sethostname box
 /opt/bootlocal.sh &
+/usr/bin/balcc-wizard

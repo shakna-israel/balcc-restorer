@@ -2,4 +2,7 @@
 # Script to Generate and Restore System-Level Images
 
 echo "balcc-restorer!"
-
+read
+df -h
+read
+poweroff
