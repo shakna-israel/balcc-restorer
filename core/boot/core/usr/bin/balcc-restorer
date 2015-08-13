@@ -1,0 +1,5 @@
+#!/bin/sh
+# Script to Generate and Restore System-Level Images
+
+echo "balcc-restorer!"
+
