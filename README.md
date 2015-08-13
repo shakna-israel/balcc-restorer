@@ -47,16 +47,17 @@ The steps below are for a Linux machine, preferably Debian.
 
 It should be possible to accomplish something similar under Windows or Mac, but that is beyond this documentation.
 
-```
-cd $LOCATION/core/boot/
+*You must have met the Minimum Requirements (Server) first!*
 
-cd $LOCATION
-mkisofs -l -J -R -V TC-custom -no-emul-boot -boot-load-size 4 -boot-info-table -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat -o balcc-restorer.iso core
 ```
-
-NOTE: *$LOCATION* refers to the folder inside which the [core](core) folder can be found.
+git clone https://github.com/shakna-israel/balcc-restorer
+cd balcc-restorer
+./image.sh
+```
 
 NOTE: *sudo* is required, as some of the files contain system level permissions, which will remain the same once compiled and running.
+
+This will have produced a balcc-restore.iso file that you can use to boot from.
 
 *In future, compiled ISOs may be released.*
 
