@@ -1,8 +1,21 @@
 #!/bin/sh
 # Script to Generate and Restore System-Level Images
 
-echo "balcc-restorer!"
-read
-df -h
-read
-poweroff
+function intro {
+    echo "Welcome to balcc-restorer"
+    echo "Proceed with CAUTION"
+    echo ""
+    echo "Press enter to continue"
+    read
+}
+
+function generate_image {
+    dd if=$1 conv=sync,noerror bs=64K | gzip -c  > $2/$3.img.gz
+    fdisk -l /dev/hda > $2/$3.info
+}
+
+function restore_image {
+    gunzip -c $1 | dd of=$2 bs=64K 
+}
+
+intro
