@@ -6,6 +6,10 @@ It utilises dd and gzip to generate image files, which can thus be restored or m
 
 ***This is Alpha Software***, untested, and entirely ***not reccommended for any use whatsoever***.
 
+## Releases
+
+You can get a copy of the latest built ISO from [here](https://github.com/shakna-israel/balcc-restorer/releases), or follow the instructions below to create one yourself.
+
 ## Minimum Requirements (Client):
 
 64mb RAM
@@ -58,8 +62,6 @@ cd balcc-restorer
 NOTE: *sudo* is required, as some of the files contain system level permissions, which will remain the same once compiled and running.
 
 This will have produced a balcc-restore.iso file that you can use to boot from.
-
-*In future, compiled ISOs may be released.*
 
 # License
 
