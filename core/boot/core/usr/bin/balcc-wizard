@@ -8,35 +8,56 @@ fetch_hard_drive () {
 }
 
 generate_image () {
-    dd if=$1 conv=sync,noerror bs=64K | gzip -9c  > $2/$3.img.gz
-    fdisk -l /dev/hda > $2/$3.info
+    # Progress could technically be done via pv, but is not available under busybox, and non-trivial to package for TinyCoreLinux
+    dd if="$1" conv=sync,noerror bs=64K | gzip -9c  > "$2"/"$3".img.gz
+    fdisk -l /dev/hda > "$2"/"$3".info
 }
 
 restore_image () {
-    gunzip -c $1 | dd of=$2 bs=64K
+    # Progress could technically be done via pv, but is not available under busybox, and non-trivial to package for TinyCoreLinux
+    gunzip -c "$1" | dd of="$2" bs=64K
 }
 
 choose_mount () {
-    fdisk -l
+    clear
+    fetch_hard_drive
     if [ "$1" = "generate" ]; then
         echo "Generating Images Not Yet Implemented"
-        read
+        read -r -r
     fi
     if [ "$1" = "restore" ]; then
         echo "Restoring Images Not Yet Implemented"
-        read
+        read -r
     fi
 }
 
 choice_restore_generate () {
-    echo "Do you wish to (G)enerate a new image, or (R)estore from an old one?"
-    read choice
+    clear
+    echo "Do you wish to:"
+    echo "(G)enerate a new image?"
+    echo "(R)estore from an old one?"
+    echo "(P)ower off?"
+    read -r choice
     if [ -n "$choice" ]; then
-        if [ "x$choice" = "G"; then
+        if [ "$choice" = "G" ]; then
             choose_mount generate
         fi
-        if [ "x$choice" = "R"; then
+        if [ "$choice" = "R" ]; then
             choose_mount restore
+        fi
+        if [ "$choice" = "P" ]; then
+            echo "Are you sure you want to turn off the machine? y/n"
+            read -r powerchoice
+            if [ "$powerchoice" = "y" ]; then
+                poweroff
+            else
+                choice_restore_generate
+            fi
+            if [ "$powerchoice" = "Y" ]; then
+                poweroff
+            else
+                choice_restore_generate
+            fi
         fi
     else
         choice_restore_generate
@@ -44,20 +65,15 @@ choice_restore_generate () {
 }
 
 intro () {
+    clear
     echo "Welcome to balcc-restorer"
     echo "Proceed with CAUTION"
     echo ""
     echo "Press enter to continue"
-    read
+    read -r
     clear
     choice_restore_generate
 }
 
 # Main
 intro
-# Display Hard Drives
-# Ask if Restoring Image or Generating Image
-# Choose Hard Drive to Mount, to Restore Image From or Generate Image To
-# Choose Hard Drive to Generate Image From or Restore Image To
-# Run generate_image or restore_image with correct parameters
-# Poweroff
